@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyShare | Share, Study, Succeed</title>
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Apply the saved theme before the page paints so dark mode doesn't flash light.
+    document.documentElement.dataset.theme = localStorage.getItem('ss_theme_mode') || 'light';
+  </script>
+</head>
+<body>
+
+  <!-- ===================== Login ===================== -->
+  <section id="authScreen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-mark"><img src="assets/logo.png" alt="" width="72" height="72"></div>
+      <h1>StudyShare</h1>
+      <p class="tagline">Share, Study, Succeed</p>
+
+      <form id="loginForm" class="auth-form">
+        <label class="field">
+          <span>👤</span>
+          <input id="loginEmail" type="email" placeholder="Email address" autocomplete="email" required>
+        </label>
+        <label class="field">
+          <span>🔒</span>
+          <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" required>
+          <button type="button" class="eye" id="togglePassword" aria-label="Show or hide password">👁️</button>
+        </label>
+        <div class="auth-options">
+          <label><input type="checkbox" id="rememberMe"> Remember me</label>
+          <a href="#" id="forgotLink">Forgot Password?</a>
+        </div>
+        <p id="loginMessage" class="message"></p>
+        <button class="primary full" type="submit">LOGIN</button>
+      </form>
+
+      <div class="or"><span></span>or<span></span></div>
+      <button class="outline full" id="showRegister">CREATE AN ACCOUNT</button>
+      <p class="terms">By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+    </div>
+  </section>
+
+  <!-- ===================== Register ===================== -->
+  <section id="registerScreen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-mark"><img src="assets/logo.png" alt="" width="72" height="72"></div>
+      <h1>StudyShare</h1>
+      <p class="tagline">Create your account</p>
+
+      <form id="registerForm" class="auth-form">
+        <label class="field">
+          <span>👤</span>
+          <input id="regName" placeholder="Full name" required>
+        </label>
+        <label class="field">
+          <span>✉️</span>
+          <input id="regEmail" type="email" placeholder="Email address" required>
+        </label>
+        <label class="field">
+          <span>👤</span>
+          <input id="regUsername" placeholder="Username" required>
+        </label>
+        <label class="field">
+          <span>🔒</span>
+          <input id="regPassword" type="password" minlength="6" placeholder="Password (at least 6 characters)" autocomplete="new-password" required>
+        </label>
+        <p id="registerMessage" class="message"></p>
+        <button class="primary full" type="submit">CREATE ACCOUNT</button>
+      </form>
+
+      <button class="text-button" id="backToLogin">← Back to Login</button>
+    </div>
+  </section>
+
+  <!-- ===================== App ===================== -->
+  <section id="appScreen" class="app-shell hidden">
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand"><img src="assets/logo.png" alt="" width="32" height="32"> StudyShare</div>
+      <nav>
+        <button data-page="home" class="nav-link active">🏠 <span>Home</span></button>
+        <button data-page="library" class="nav-link">📖 <span>Reviewer Library</span></button>
+        <button data-page="upload" class="nav-link">📤 <span>Upload Reviewer</span></button>
+        <button data-page="uploads" class="nav-link">🗃️ <span>My Uploads</span></button>
+        <button data-page="profile" class="nav-link">👤 <span>Profile</span></button>
+        <button data-page="settings" class="nav-link">⚙️ <span>Settings</span></button>
+      </nav>
+      <button id="logoutBtn" class="nav-link logout-link">🚪 <span>Logout</span></button>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle" type="button"
+                aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="profile-shortcut" id="profileShortcut" type="button" title="Open profile" aria-label="Open profile">
+          <span class="avatar small-avatar" id="topAvatar">S</span>
+        </button>
+      </header>
+
+      <!-- Shared back button: script.js moves it to the top of whichever page is open. -->
+      <button id="backBtn" class="back-link page-back hidden" type="button"></button>
+
+      <!-- Home -->
+      <section id="page-home" class="page">
+        <div class="welcome">
+          <div>
+            <h2>Welcome back, <span id="welcomeName">Student</span>! 👋</h2>
+            <p>Find and access the best reviewers for your subjects.</p>
+          </div>
+          <div class="welcome-art">📚 👨‍🎓</div>
+        </div>
+
+        <div class="large-search">
+          <input id="homeSearch" placeholder="Search reviewers...">
+          <button id="homeSearchBtn" aria-label="Search">⌕</button>
+        </div>
+
+        <div class="section-heading">
+          <h3>Browse by Subject</h3>
+          <button class="view-all" data-goto="library">View all</button>
+        </div>
+        <div class="subject-grid" id="subjectGrid">
+          <!-- Subject tiles are built in script.js from SUBJECT_GROUPS. -->
+        </div>
+
+        <div class="section-heading">
+          <h3>Recently Uploaded</h3>
+          <button class="view-all" data-goto="library">View all</button>
+        </div>
+        <div class="reviewer-grid" id="recentGrid"></div>
+
+        <div class="section-heading">
+          <h3>Popular Reviewers</h3>
+          <button class="view-all" data-goto="library">View all</button>
+        </div>
+        <div class="reviewer-grid" id="popularGrid"></div>
+      </section>
+
+      <!-- Library -->
+      <section id="page-library" class="page hidden">
+        <h2>Reviewer Library</h2>
+        <p class="muted">Find the reviewers you need.</p>
+
+        <div class="filters">
+          <input id="librarySearch" placeholder="Search reviewers...">
+          <select id="subjectFilter">
+            <option value="">Subject</option>
+            <!-- Subjects are added in script.js from SUBJECT_GROUPS. -->
+          </select>
+          <select id="categoryFilter">
+            <option value="">Category</option>
+            <option>Reviewer</option>
+            <option>Notes</option>
+            <option>Module</option>
+            <option>Presentation</option>
+            <option>Other</option>
+          </select>
+          <select id="sortFilter">
+            <option value="newest">Sort by: Newest</option>
+            <option value="liked">Most liked</option>
+            <option value="popular">Most viewed</option>
+            <option value="title">Title A–Z</option>
+          </select>
+        </div>
+
+        <div id="libraryList" class="reviewer-list"></div>
+        <p id="emptyLibrary" class="empty hidden">No reviewers found. Try another search or upload the first one.</p>
+      </section>
+
+      <!-- Reviewer details -->
+      <section id="page-details" class="page hidden">
+        <div id="detailContent"></div>
+      </section>
+
+      <!-- Report -->
+      <section id="page-report" class="page hidden">
+        <h2>Report Reviewer</h2>
+        <p class="muted">Tell us what is wrong with this reviewer. Your report goes straight to the StudyShare admin.</p>
+
+        <form id="reportForm" class="report-form">
+          <div class="report-target" id="reportTarget"></div>
+
+          <fieldset class="violation-group">
+            <legend>What does this reviewer violate? *</legend>
+
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Illegal content" required>
+              <div><strong>Illegal content</strong><span>Pirated, stolen or otherwise unlawful material.</span></div>
+            </label>
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Sexual / inappropriate content">
+              <div><strong>Sexual / inappropriate content</strong><span>Explicit, violent or unsuitable for a study platform.</span></div>
+            </label>
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Discriminatory content">
+              <div><strong>Discriminatory content</strong><span>Targets people for who they are.</span></div>
+            </label>
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Harassment or bullying">
+              <div><strong>Harassment or bullying</strong><span>Attacks, threats or shaming of a person.</span></div>
+            </label>
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Copyright infringement">
+              <div><strong>Copyright infringement</strong><span>Shared without permission from the owner.</span></div>
+            </label>
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Spam or misleading">
+              <div><strong>Spam or misleading</strong><span>Fake, irrelevant or deceptive content.</span></div>
+            </label>
+            <label class="violation-option">
+              <input type="radio" name="violation" value="Other">
+              <div><strong>Other</strong><span>Something else. Explain it in your comment.</span></div>
+            </label>
+          </fieldset>
+
+          <label class="report-comment">Comment about this reviewer *
+            <textarea id="reportComment" rows="5" maxlength="1000" required
+                      placeholder="Describe what is wrong with the content of this reviewer..."></textarea>
+            <small class="char-count" id="reportCounter">0 / 1000</small>
+          </label>
+
+          <p id="reportMessage" class="message"></p>
+          <div class="form-actions">
+            <button type="button" class="outline" id="cancelReport">CANCEL</button>
+            <button type="submit" class="primary">SUBMIT REPORT</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Upload -->
+      <section id="page-upload" class="page hidden">
+        <h2>Upload Reviewer</h2>
+        <p class="muted">Share your knowledge. Help other students!</p>
+
+        <form id="uploadForm" class="upload-form">
+          <label>Reviewer Title *
+            <input id="reviewerTitle" required maxlength="90" placeholder="Enter reviewer title">
+          </label>
+
+          <div class="two-fields">
+            <label>Subject *
+              <select id="uploadSubject" required>
+                <option value="">Select subject</option>
+            <!-- Subjects are added in script.js from SUBJECT_GROUPS. -->
+              </select>
+            </label>
+            <label>Category *
+              <select id="uploadCategory" required>
+                <option value="">Select category</option>
+                <option>Reviewer</option>
+                <option>Notes</option>
+                <option>Module</option>
+                <option>Presentation</option>
+                <option>Other</option>
+              </select>
+            </label>
+          </div>
+
+          <label>Description
+            <textarea id="reviewerDescription" rows="4" placeholder="Enter description about this reviewer..."></textarea>
+          </label>
+
+          <label>Upload File *
+            <div class="drop-zone" id="dropZone">
+              <input id="reviewerFile" type="file" hidden
+                     accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.txt,.xls,.xlsx,.csv">
+              <div class="upload-icon">☁</div>
+              <strong>Click to choose file or drag and drop</strong>
+              <span>Images, PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT (Max. 20MB)</span>
+              <small id="fileName">No file selected</small>
+            </div>
+          </label>
+
+          <p id="uploadMessage" class="message"></p>
+          <div class="form-actions">
+            <button type="reset" class="outline">CANCEL</button>
+            <button class="primary" type="submit">UPLOAD</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- My uploads -->
+      <section id="page-uploads" class="page hidden">
+        <div class="section-heading">
+          <div>
+            <h2>My Uploads</h2>
+            <p class="muted">Manage the reviewers you have uploaded.</p>
+          </div>
+          <button class="primary" data-goto="upload">＋ UPLOAD NEW REVIEWER</button>
+        </div>
+        <div id="myUploadsList" class="reviewer-list"></div>
+        <p id="emptyUploads" class="empty hidden">You haven't uploaded any files yet.</p>
+      </section>
+
+      <!-- Profile -->
+      <section id="page-profile" class="page hidden">
+        <div class="profile-banner">
+          <div class="avatar profile-avatar" id="profileAvatar">S</div>
+          <div>
+            <h2 id="profileName">Student</h2>
+            <p id="profileHandle">@student</p>
+            <p id="profileEmail">student@email.com</p>
+            <small id="joinedDate">Joined today</small>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div><strong id="uploadCount">0</strong><span>Uploads</span></div>
+          <div><strong id="downloadCount">0</strong><span>Total Downloads</span></div>
+          <div><strong id="likeCount">0</strong><span>Likes</span></div>
+        </div>
+
+        <div class="profile-panel">
+          <div>
+            <h3>About Me</h3>
+            <p id="aboutText">I love sharing reviewers and helping my classmates succeed!</p>
+          </div>
+          <button class="outline" id="editProfileBtn">EDIT PROFILE</button>
+        </div>
+
+        <div class="profile-panel settings-panel">
+          <h3>Account Settings</h3>
+          <button data-goto="settings">Change Password <span>›</span></button>
+        </div>
+
+        <button class="danger full" id="profileLogout">LOGOUT</button>
+      </section>
+
+      <!-- Settings -->
+      <section id="page-settings" class="page hidden">
+        <h2>Settings</h2>
+        <p class="muted">Make StudyShare feel like your own.</p>
+
+        <div class="settings-card">
+          <h3>Appearance</h3>
+          <p class="muted">Choose a light or dark look, or pick a color for the navigation bar.</p>
+
+          <div class="theme-mode">
+            <button type="button" class="theme-choice" id="lightThemeBtn">☀ Light</button>
+            <button type="button" class="theme-choice" id="darkThemeBtn">☾ Dark</button>
+          </div>
+
+          <label class="color-picker-label" for="navColor">
+            Custom theme color
+            <input id="navColor" type="color" value="#1b329b">
+          </label>
+          <button type="button" class="outline reset-theme" id="resetThemeBtn">RESET THEME</button>
+        </div>
+
+        <form id="passwordForm" class="upload-form settings-form">
+          <h3>Change Password</h3>
+          <label>Current Password
+            <input id="currentPassword" type="password" required>
+          </label>
+          <label>New Password
+            <input id="newPassword" type="password" minlength="6" autocomplete="new-password" required>
+          </label>
+          <label>Confirm New Password
+            <input id="confirmPassword" type="password" minlength="6" autocomplete="new-password" required>
+          </label>
+          <p id="settingsMessage" class="message"></p>
+          <button class="primary">UPDATE PASSWORD</button>
+        </form>
+
+        <div class="profile-panel">
+          <div>
+            <h3>Privacy</h3>
+            <p class="muted">Your uploaded files are stored in this browser on this device.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <dialog id="editDialog">
+    <form method="dialog" id="profileEditForm">
+      <h3>Edit Profile</h3>
+      <label>Full name
+        <input id="editName" required>
+      </label>
+      <label>Username
+        <input id="editUsername" required>
+      </label>
+      <label>About me
+        <textarea id="editAbout" rows="3"></textarea>
+      </label>
+      <div class="form-actions">
+        <button class="outline" type="button" id="cancelEditBtn">CANCEL</button>
+        <button class="primary" type="submit" id="saveProfileBtn">SAVE</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
